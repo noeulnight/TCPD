@@ -18,6 +18,7 @@ const db = knex({ client: 'mysql', connection: { host: 'localhost', user:'tcpd',
 const cors = require('cors')
 const { renderFile: render } = require('ejs')
 
+app.use('/uploads', express.static(path + '/uploads'))
 app.use(express.urlencoded({extended:false}))
 app.use(passport.initialize())
 app.set('jwt-secret', SECRET)
@@ -38,7 +39,7 @@ const storage = multer.diskStorage({destination: (req, file, cb) => cb(null, 'up
 
 app.get("/redirect/twitch", passport.authenticate("twitch"))
 app.get("/auth/twitch", passport.authenticate("twitch", { failureRedirect: "/" }), async (req, res) => {
-  const { id, login, display_name, email } = req.user
+  let { id, login, display_name, email } = req.user
   const [exist] = await db.where({ id }).from('users').select('*')
   if (!exist) { 
   await db.insert({ id, login, name:display_name, email }).from('users').select('*')
@@ -71,6 +72,10 @@ app.get('/dashboard', auth, async (req, res) => {
     const str = await render(path + '/page/dashboard.ejs')
     res.send(str)
   }).catch(() => res.send('<script>alert("채널포인트를 사용할수 없는 스트리머이거나, 트위치 연결중 오류가 발생했습니다. 나중에 다시 시도해주세요."); location.href="/"</script>'))
+})
+
+app.get('/widget/:code', (req, res) => {
+
 })
 
 app.listen(PORT, () => console.log('server is now online'))
