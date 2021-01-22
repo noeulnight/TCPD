@@ -21,7 +21,7 @@ const db = knex({ client: 'mysql', connection: { host: 'localhost', user:'tcpd',
 const cors = require('cors')
 const { renderFile: render } = require('ejs')
 const srv = createServer(app)
-const io = socket(srv)
+const wss = socket(srv)
 
 app.use('/uploads', express.static(path + '/uploads'))
 app.use('/public', express.static(path + '/public'))
@@ -87,6 +87,7 @@ app.get('/img/:id', async (req, res) => {
 
 app.get('/dashboard', auth, async (req, res) => {
   const [oauth] = await db.where({id:req.user.id}).from('oauth').select('*')
+  if (!oauth) return res.redirect('/redirect/twitch')
   superagent.get('https://api.twitch.tv/helix/channel_points/custom_rewards?broadcaster_id=' + req.user.id).set({ 'Client-Id': TClientid, 'Authorization': 'Bearer ' +  oauth.oauth}).then( async (_res) => {
     JSON.parse(_res.text()).data.forEach( async (v,i) => {
       const [exist] = await db.insert({ id: v.id, title: v.title, bid: v.broadcaster_id }).from('point2name').select('*')
@@ -102,16 +103,23 @@ app.get('/widget/:code', async (req, res) => {
   if (!code) return res.redirect('/')
   const [exist] = await db.where({ session:code }).from('users').select('*')
   if (!exist) return res.redirect('/')
-  const point = await db.where({ bid:exist.id }).from('users').select('*')
-  const str = await render(path + '/page/widget.ejs', { user: exist.login, point  })
+  const str = await render(path + '/page/widget.ejs', { user: exist.login })
   res.send(str)
+})
+
+wss.on('connection', (socket) => {
+  socket.on("point", async (uid, message) => {
+    const [points] = await db.where({ id:message }).from('point2name').select('*')
+    const random = crs({length: 10, type: 'alphanumeric'})
+    !points ? socket.emit(uid, '채널 포인트', random) : socket.emit(uid, points.title, random) 
+  })
 })
 
 srv.listen(PORT, () => console.log('server is now online'))
 
 function imageFilter (req, file, cb) {
   if (!file.originalname.match(/\.(jpg|JPG|jpeg|JPEG|png|PNG|gif|GIF)$/)) {
-      req.fileValidationError = 'Only image files are allowed!'
-      return cb(new Error('Only image files are allowed!'), false)
+      req.fileValidationError = '사진만 등록할수 있습니다!'
+      return cb(new Error('사진만 등록할수 있습니다!'), false)
   } cb(null, true)
 }
