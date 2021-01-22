@@ -1,40 +1,47 @@
-let play = false
-let stop = false 
-let list = []
-const s = io() // 소켓 설정
+// https://www.google.com/speech-api/v1/synthesize?text=9100원을 받은 줄 알았는데, 알고보니 후원 테스트 중이었네요. Kappa Kappa&lang=ko-kr&speed=0.4
 
+const s = io()
 s.on('donation', (data) => {
 
 })
 
-setInterval(() => {
-  if ( play === true || stop === true || list.length === 0) return
-  console.log('Play Donation.')
-  play = true
-  fetch('/donate/api/v1?text=' + encodeURI(msg) + '&type=' + list[0].chr).then(function(response) { return response.json() }).then(function(json) {
-    document.getElementById('typecast').style.display = 'block'
-    document.getElementById("name").innerHTML = `<span>${list[0].name}</span>님이 <span>${list[0].type}</span>(을)를 사용했습니다.`
-    document.getElementById("text").innerText = msg
-    document.getElementById("cracker").play()
-    document.getElementById("tts").src = json.url
-    list[0].chr === 'chr2' ? document.getElementById('typecast').style.display = 'block' : document.getElementById('typecast').style.display = 'none'
-    $( 'div' ).fadeIn( 500 )
-    setTimeout(() => {
-      document.getElementById("tts").play()
-    }, 1000)
-    setTimeout(() => {
-      remove()
-    }, 5000)
-  })
-}, 100)
+let list = []
 
-function remove() {
-  setTimeout(() => {
-    if (!document.getElementById("tts").paused) return remove()
-    $( 'div' ).fadeOut( 500 )
-    list.shift()
+window.onload = () => {
+  const channel = document.getElementById('user').innerText
+  const point = document.getElementById('rewards').innerText
+  const client = new tmi.Client({
+    connection: { reconnect: true },
+    channels: [ 'nunggom' ]
+  })
+  client.connect()
+  client.on('message', (channel, tags, message, self) => {
+    !message ? list.push({ name: tags['display-name'] }) : true
+  })
+  
+  setInterval(() => {
+    if (list.length === 0) return
+    play = true
+      document.getElementById("name").innerHTML = `<span>${list[0].name}</span>님이 <span>${list[0].type}</span>(을)를 사용했습니다.`
+      document.getElementById("cracker").play()
+      document.getElementById("tts").src = json.url
+      $( 'div' ).fadeIn( 500 )
+      setTimeout(() => {
+        document.getElementById("tts").play()
+      }, 1000)
+      setTimeout(() => {
+        remove()
+      }, 5000)
+  }, 100)
+  
+  function remove() {
     setTimeout(() => {
-      play = 0
-    }, 100)
-  }, 10);
+      if (!document.getElementById("tts").paused) return remove()
+      $( 'div' ).fadeOut( 500 )
+      list.shift()
+      setTimeout(() => {
+        play = 0
+      }, 100)
+    }, 10)
+  }
 }

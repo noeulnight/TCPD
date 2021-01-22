@@ -5,6 +5,7 @@ use tcpd;
 
 create table users (
   id varchar(30) not null primary key,
+  session varchar(10) not null,
   login varchar(30) not null,
   name varchar(30),
   email varchar(30),
@@ -14,6 +15,12 @@ create table users (
 create table oauth (
   id varchar(30) not null primary key,
   oauth varchar(30)
+);
+
+create table point2name (
+  id varchar(30) not null primary key,
+  name varchar(30),
+  bid varchar(30)
 );
 
 create table pointimage (

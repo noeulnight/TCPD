@@ -1,1 +1,62 @@
-asdc
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>TCPD</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.1.0/mdb.min.css" rel="stylesheet"/>
+    <link href="/public/css/dashboard.css" rel="stylesheet"/>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.1.0/mdb.min.js"></script>
+    <script>let selectid = '' </script>
+  </head>
+  <body class="bg-dark"><br>
+    <div class="container">
+      <div class="row">
+        <div class="card text-center">
+          <img class="card-img-top" src="holder.js/100px180/" alt="">
+          <div class="card-body">
+            <h4 class="card-title"><%= user.login %>님의 위젯 세션은</h4>
+            <p class="card-text"><a href="<%= setting.url %><%= user.session %>"><%= setting.url %><%= user.session %></a> 입니다.</p>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <% reward.data.forEach((v, i) => { %>
+          <div class="card m-3 text-center" style="width: 30.9%; background-color: <%= v.background_color %>;">
+            <div class="card-body">
+              <img class="card-img-top" style="width: 50px;" src="<%= v.default_image.url_1x ? v.default_image.url_1 : 'https://static-cdn.jtvnw.net/custom-reward-images/default-1.png' %>" alt="">
+              <h4 class="card-title itemtitle"><%= v.title %></h4>
+              <p class="card-text itemdesc"><%= v.prompt %></p>
+              <p class="card-text itemdesc">포인트 ID : <%= v.id %><br>유져 텍스트 입력이 <%= v.is_user_input_require ? '활성화' : '비활성화' %> 되있습니다.<br><%= v.cost %>포인트로 구매 할수있습니다.<br/>현재 모든 유저가 구매 <%= v.is_paused ? '불가능' : '가능' %> 합니다.</p>
+              <a onclick="selectid = '<%= v.id %>'; document.getElementById('imguploadLabel').innerText = '\'<%= v.title %>\' 리워드를 선택했습니다.'; document.getElementById('imgsave').action = '/upload/img?id=<%= v.id %>'; document.getElementById('nowimg').src = ('/img/=<%= v.id %>').replace('=', '');" data-mdb-toggle="modal" data-mdb-target="#imgupload" class="btn btn-primary" role="button">후원 이미지 등록</a>
+            </div>
+          </div>
+        <% }) %>
+      </div>  
+    </div>
+
+    <div class="modal fade" id="imgupload" tabindex="-1" aria-labelledby="imguploadLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="imguploadLabel"></h5>
+            <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body text-center">
+            <h4>현재 등록된 후원 이미지</h4>
+            <img id='nowimg' src="" style="height:150px"><hr/>
+            <h4>이미지 새로 등록하기</h4>
+            <form id="imgsave" method="POST" action="/upload/img?id" type="button" enctype="multipart/form-data">
+              <div>
+                <label>후원 이미지에 사용될 사진을 업로드 해주세요</label><br>
+                <input type="file" name="profile" class="btn btn-danger"/>
+              </div>
+                <button type="submit" class="btn btn-primary" value="Upload">사진 업로드</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </body>
+</html>
