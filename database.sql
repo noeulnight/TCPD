@@ -18,7 +18,7 @@ create table oauth (
 );
 
 create table point2name (
-  id varchar(30) not null primary key,
+  id varchar(50) not null primary key,
   name varchar(30),
   bid varchar(30)
 );
