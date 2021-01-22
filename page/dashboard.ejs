@@ -46,12 +46,11 @@
             <h4>현재 등록된 후원 이미지</h4>
             <img id='nowimg' src="" style="height:150px"><hr/>
             <h4>이미지 새로 등록하기</h4>
-            <form id="imgsave" method="POST" action="/upload/img?id" type="button" enctype="multipart/form-data">
-              <div>
-                <label>후원 이미지에 사용될 사진을 업로드 해주세요</label><br>
-                <input type="file" name="profile" class="btn btn-danger"/>
+            <form action="/stats" id="imgsave" enctype="multipart/form-data" method="post">
+              <div class="form-group">
+                <input type="file" class="form-control-file" name="profile">
+                <input type="submit" value="사진 업로드" class="btn btn-default">            
               </div>
-                <button type="submit" class="btn btn-primary" value="Upload">사진 업로드</button>
             </form>
           </div>
         </div>
