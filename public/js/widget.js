@@ -10,7 +10,7 @@ window.onload = () => {
   const session = location.href.split('/')[location.href.split('/').length - 1]
   const client = new tmi.Client({
     connection: { reconnect: true },
-    channels: [ 'nunggom' ]
+    channels: [ channel ]
   })
   client.connect()
   client.on('message', (channel, tags, message, self) => {
@@ -19,7 +19,7 @@ window.onload = () => {
     s.on(session, (point, uid) => {
       if (already.includes(uid)) return
       already.push(uid)
-      !message ? list.push({ name: tags['display-name'], type: point, id:tags['custom-reward-id'], uid }) : list.push({ name: tags['display-name'], id:tags['custom-reward-id'],type: point, uid })
+      !message ? list.push({ name: tags['display-name'], type: point, id:tags['custom-reward-id'], uid }) : list.push({ name: tags['display-name'], message, id:tags['custom-reward-id'],type: point, uid })
     })
   })
 }
@@ -30,7 +30,13 @@ setInterval(() => {
   document.getElementById("name").innerHTML = `<span>${list[0].name}</span>님이 <span>${list[0].type}</span>(을)를 사용했습니다.`
   document.getElementById("image").src = `/img/${list[0].id}`
   document.getElementById("cracker").play()
-  document.getElementById("tts").src = `https://www.google.com/speech-api/v1/synthesize?text=${list[0].name}님이 ${list[0].type}를 사용했습니다.&lang=ko-kr&speed=0.4`
+  if (list[0].message) {
+    document.getElementById("text").innerText = list[0].message
+    document.getElementById("tts").src = `https://www.google.com/speech-api/v1/synthesize?text=${msg}&lang=ko-kr&speed=0.4`
+  } else {
+    document.getElementById("text").innerText = ''
+    document.getElementById("tts").src = `https://www.google.com/speech-api/v1/synthesize?text=${list[0].name}님이 ${list[0].type}를 사용했습니다.&lang=ko-kr&speed=0.4`
+  }
   $( 'div' ).fadeIn( 500 )
   setTimeout(() => {
     console.log('ttsplay')
