@@ -87,7 +87,7 @@ app.get('/dashboard', auth, async (req, res) => {
     if (json.error) return res.send('<script>alert("채널포인트를 사용할수 없는 스트리머이거나, 트위치 연결중 오류가 발생했습니다. 나중에 다시 시도해주세요."); location.href="/"</script>')
     json.data.forEach( async (v,i) => {
       const [exist] = await db.insert({ id: v.id, title: v.title, bid: v.broadcaster_id }).from('point2name').select('*')
-      exist ? await db.update({ title: v.title }).from('point2name').select('*').where({ id: v.id, bid: v.broadcaster_id}) : await db.insert({ id: v.id, title: v.title, bid: v.broadcaster_id }).from('point2name').select('*')
+      exist ? await db.update({ name: v.title }).from('point2name').select('*').where({ id: v.id, bid: v.broadcaster_id}) : await db.insert({ id: v.id, name: v.title, bid: v.broadcaster_id }).from('point2name').select('*')
     })
     const str = await render(path + '/page/dashboard.ejs', { reward:JSON.parse(_res.text), user:req.user, setting:{url:'https://ablaze.noeul.codes/'} })
     res.send(str)
