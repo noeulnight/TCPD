@@ -32,7 +32,7 @@ app.use(express.json())
 app.use(cookieParser())
 app.use(cors())
 
-passport.use(new twitchStrategy({clientID:TClientid, clientSecret: TClientsecret, callbackURL: 'https://ablaze.noeul.codes/auth/twitch', scope: 'user_read channel:read:redemptions'}, async (accessToken, refreshToken, profile, done) => {
+passport.use(new twitchStrategy({clientID:TClientid, clientSecret: TClientsecret, callbackURL: 'http://localhost:8080/auth/twitch', scope: 'user_read channel:read:redemptions'}, async (accessToken, refreshToken, profile, done) => {
   const [exist] = await db.where({ id:profile.id }).from('oauth').select('*')
   exist ? await db.update({ id:profile.id, oauth:accessToken }).from('oauth').select('*').where({ id:profile.id }) : await db.insert({ id:profile.id, oauth:accessToken }).from('oauth').select('*')
   return done(null, profile)
@@ -86,7 +86,7 @@ app.get('/dashboard', auth, async (req, res) => {
   fetch('https://api.twitch.tv/helix/channel_points/custom_rewards?broadcaster_id=' + req.user.id, {method:'GET', headers: { 'Client-Id': TClientid, 'authorization': 'Bearer ' + oauth.oauth }}).then(res => res.json()).then( async json => {
     if (json.error) return res.send('<script>alert("채널포인트를 사용할수 없는 스트리머이거나, 트위치 연결중 오류가 발생했습니다. 나중에 다시 시도해주세요."); location.href="/"</script>')
     json.data.forEach( async (v,i) => {
-      const [exist] = await db.insert({ id: v.id, name: v.title, bid: v.broadcaster_id }).from('point2name').select('*')
+      const [exist] = await db.where({ id: v.id, name: v.title, bid: v.broadcaster_id }).from('point2name').select('*')
       exist ? await db.update({ name: v.title }).from('point2name').select('*').where({ id: v.id, bid: v.broadcaster_id}) : await db.insert({ id: v.id, name: v.title, bid: v.broadcaster_id }).from('point2name').select('*')
     })
     const str = await render(path + '/page/dashboard.ejs', { reward:JSON.parse(_res.text), user:req.user, setting:{url:'https://ablaze.noeul.codes/'} })
