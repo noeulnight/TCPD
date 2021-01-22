@@ -68,7 +68,8 @@ app.post('/upload/img', auth, (req, res) => {
     else if (err) return res.send(err).status(500)
     const [exist] = await db.where({ id }).select('*').from('pointimage')
     exist ? await db.update({ id, url:'/' + req.file.path, channelid: req.user.id }).select('*').from('pointimage').where({ id }) : await db.insert({ id, url:'/' + req.file.path, channelid: req.user.id }).select('*').from('pointimage')
-    res.send('<script>alert("정상적으로?broadcaster_id=' + req.user.id, {method:'GET', headers: { 'Client-Id': TClientid, 'authorization': 'Bearer ' + oauth.oauth }}).then(res => res.json()).then(json => {
+    res.send('<script>alert("정상적으로 후원 이미지를 업로드 하였습니다."); location.href="/dashboard"</script>')
+  })
 })
 
 app.get('/img/:id', async (req, res) => {
@@ -92,7 +93,6 @@ app.get('/dashboard', auth, async (req, res) => {
     res.send(str)
   })
 })
-
 app.get('/widget/:code', async (req, res) => {
   const { code } = req.params
   if (!code) return res.redirect('/')
