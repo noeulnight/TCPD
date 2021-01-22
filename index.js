@@ -32,7 +32,7 @@ app.use(express.json())
 app.use(cookieParser())
 app.use(cors())
 
-passport.use(new twitchStrategy({clientID:TClientid, clientSecret: TClientsecret, callbackURL: 'http://localhost:8080/auth/twitch', scope: 'user_read channel:read:redemptions'}, async (accessToken, refreshToken, profile, done) => {
+passport.use(new twitchStrategy({clientID:TClientid, clientSecret: TClientsecret, callbackURL: 'https://ablaze.noeul.codes/auth/twitch', scope: 'user_read channel:read:redemptions'}, async (accessToken, refreshToken, profile, done) => {
   const [exist] = await db.where({ id:profile.id }).from('oauth').select('*')
   exist ? await db.update({ id:profile.id, oauth:accessToken }).from('oauth').select('*').where({ id:profile.id }) : await db.insert({ id:profile.id, oauth:accessToken }).from('oauth').select('*')
   return done(null, profile)
