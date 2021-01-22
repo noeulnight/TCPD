@@ -8,7 +8,7 @@ const express = require('express')
 const multer = require('multer')
 const { createServer } = require('http')
 const path = require('path').resolve()
-const superagent = require('superagent')
+const fetch = require('node-fetch')
 const passport = require('passport')
 const socket = require('socket.io')
 const crs = require('crypto-random-string')
@@ -32,7 +32,7 @@ app.use(express.json())
 app.use(cookieParser())
 app.use(cors())
 
-passport.use(new twitchStrategy({clientID:TClientid, clientSecret: TClientsecret, callbackURL: 'http://localhost:8080/auth/twitch', scope: 'user_read channel:read:redemptions'}, async (accessToken, refreshToken, profile, done) => {
+passport.use(new twitchStrategy({clientID:TClientid, clientSecret: TClientsecret, callbackURL: 'https://ablaze.noeul.codes/auth/twitch', scope: 'user_read channel:read:redemptions'}, async (accessToken, refreshToken, profile, done) => {
   const [exist] = await db.where({ id:profile.id }).from('oauth').select('*')
   exist ? await db.update({ id:profile.id, oauth:accessToken }).from('oauth').select('*').where({ id:profile.id }) : await db.insert({ id:profile.id, oauth:accessToken }).from('oauth').select('*')
   return done(null, profile)
@@ -68,13 +68,7 @@ app.post('/upload/img', auth, (req, res) => {
     else if (err) return res.send(err).status(500)
     const [exist] = await db.where({ id }).select('*').from('pointimage')
     exist ? await db.update({ id, url:'/' + req.file.path, channelid: req.user.id }).select('*').from('pointimage').where({ id }) : await db.insert({ id, url:'/' + req.file.path, channelid: req.user.id }).select('*').from('pointimage')
-    res.send('<script>alert("정상적으로 후원 이미지를 업로드 하였습니다."); location.href="/dashboard"</script>')
-  })
-})
-
-app.get('/test', async (req, res) => {
-  const user = await db.select('*').from('users')
-  res.send(user)
+    res.send('<script>alert("정상적으로?broadcaster_id=' + req.user.id, {method:'GET', headers: { 'Client-Id': TClientid, 'authorization': 'Bearer ' + oauth.oauth }}).then(res => res.json()).then(json => {
 })
 
 app.get('/img/:id', async (req, res) => {
@@ -88,14 +82,15 @@ app.get('/img/:id', async (req, res) => {
 app.get('/dashboard', auth, async (req, res) => {
   const [oauth] = await db.where({id:req.user.id}).from('oauth').select('*')
   if (!oauth) return res.redirect('/redirect/twitch')
-  superagent.get('https://api.twitch.tv/helix/channel_points/custom_rewards?broadcaster_id=' + req.user.id).set({ 'Client-Id': TClientid, 'Authorization': 'Bearer ' +  oauth.oauth}).then( async (_res) => {
-    JSON.parse(_res.text()).data.forEach( async (v,i) => {
+  fetch('https://api.twitch.tv/helix/channel_points/custom_rewards?broadcaster_id=' + req.user.id, {method:'GET', headers: { 'Client-Id': TClientid, 'authorization': 'Bearer ' + oauth.oauth }}).then(res => res.json()).then( async json => {
+    if (json.error) return res.send('<script>alert("채널포인트를 사용할수 없는 스트리머이거나, 트위치 연결중 오류가 발생했습니다. 나중에 다시 시도해주세요."); location.href="/"</script>')
+    json.data.forEach( async (v,i) => {
       const [exist] = await db.insert({ id: v.id, title: v.title, bid: v.broadcaster_id }).from('point2name').select('*')
       exist ? await db.update({ title: v.title }).from('point2name').select('*').where({ id: v.id, bid: v.broadcaster_id}) : await db.insert({ id: v.id, title: v.title, bid: v.broadcaster_id }).from('point2name').select('*')
     })
-    const str = await render(path + '/page/dashboard.ejs', { reward:JSON.parse(_res.text), user:req.user, setting:{url:'https://tcpd.noeul.codes/'} })
+    const str = await render(path + '/page/dashboard.ejs', { reward:JSON.parse(_res.text), user:req.user, setting:{url:'https://ablaze.noeul.codes/'} })
     res.send(str)
-  }).catch(() => res.send('<script>alert("채널포인트를 사용할수 없는 스트리머이거나, 트위치 연결중 오류가 발생했습니다. 나중에 다시 시도해주세요."); location.href="/"</script>'))
+  })
 })
 
 app.get('/widget/:code', async (req, res) => {
