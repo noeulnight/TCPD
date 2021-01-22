@@ -89,7 +89,7 @@ app.get('/dashboard', auth, async (req, res) => {
       const [exist] = await db.where({ id: v.id, name: v.title, bid: v.broadcaster_id }).from('point2name').select('*')
       exist ? await db.update({ name: v.title }).from('point2name').select('*').where({ id: v.id, bid: v.broadcaster_id}) : await db.insert({ id: v.id, name: v.title, bid: v.broadcaster_id }).from('point2name').select('*')
     })
-    const str = await render(path + '/page/dashboard.ejs', { reward:JSON.parse(_res.text), user:req.user, setting:{url:'https://ablaze.noeul.codes/'} })
+    const str = await render(path + '/page/dashboard.ejs', { reward:JSON.parse(json), user:req.user, setting:{url:'https://ablaze.noeul.codes/'} })
     res.send(str)
   })
 })
