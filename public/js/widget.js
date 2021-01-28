@@ -37,8 +37,8 @@ setInterval(() => {
   document.getElementById("image").src = `/img/${list[0].id}`
   document.getElementById("cracker").play()
   if (list[0].message) {
-    document.getElementById("text").innerText = list[0].message
-    document.getElementById("tts").src = `https://www.google.com/speech-api/v1/synthesize?text=${list[0].message}&lang=ko-kr&speed=0.4`
+    document.getElementById("text").innerText = list[0].message.slice(0,40)
+    document.getElementById("tts").src = `https://www.google.com/speech-api/v1/synthesize?text=${list[0].message.slice(0,40)}&lang=ko-kr&speed=0.4`
   } else {
     document.getElementById("text").innerText = ''
     document.getElementById("tts").src = `https://www.google.com/speech-api/v1/synthesize?text=${list[0].name}님이 ${list[0].type}를 사용했습니다.&lang=ko-kr&speed=0.4`
