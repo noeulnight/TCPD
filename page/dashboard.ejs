@@ -28,7 +28,7 @@
               <h4 class="card-title itemtitle"><%= v.title %></h4>
               <p class="card-text itemdesc"><%= v.prompt %><%= v.cost %>포인트로 구매 할수있습니다.</p>
               <a onclick="selectid = '<%= v.id %>'; document.getElementById('imguploadLabel').innerText = '\'<%= v.title %>\' 리워드를 선택했습니다.'; document.getElementById('imgsave').action = '/upload/img?id=<%= v.id %>'; document.getElementById('nowimg').src = ('/img/=<%= v.id %>').replace('=', '');" data-mdb-toggle="modal" data-mdb-target="#imgupload" class="btn btn-primary" role="button">후
-              <p class="card-text itemdesc">포인트 ID : <%= v.id %><br>유져 텍스트 입력이 <%=원 이미지 등록</a>
+              <p class="card-text itemdesc">포인트 ID : <%= v.id %></a>
             </div>
           </div>
         <% }) %>
