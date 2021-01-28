@@ -3,11 +3,20 @@ let play = false
 const s = io()
 
 let list = []
-let already = []
+let pointname = []
 
 window.onload = () => {
   const channel = document.getElementById('user').innerText
   const session = location.href.split('/')[location.href.split('/').length - 1]
+
+  load()
+  setInterval(() => load(), 60000)
+  function load() { s.emit('ping', session) }
+  s.on(session, (point) => {
+    if (!point) return pointname = []
+    return pointname = point
+  })
+
   const client = new tmi.Client({
     connection: { reconnect: true },
     channels: [ channel ]
@@ -15,12 +24,9 @@ window.onload = () => {
   client.connect()
   client.on('message', (channel, tags, message, self) => {
     if (!tags['custom-reward-id']) return
-    s.emit('point', session, tags['custom-reward-id'])
-    s.on(session, (point, uid) => {
-      if (already.includes(uid)) return
-      already.push(uid)
-      !message ? list.push({ name: tags['display-name'], type: point, id:tags['custom-reward-id'], uid }) : list.push({ name: tags['display-name'], message, id:tags['custom-reward-id'],type: point, uid })
-    })
+    let point
+    pointname.length <= 0 || pointname.filter(v => v.id === tags['custom-reward-id']).length <= 0 ? point = '채널 포인트' : point = pointname.filter(v => v.id === tags['custom-reward-id'])[0].name
+    !message ? list.push({ name: tags['display-name'], type: point, id:tags['custom-reward-id'] }) : list.push({ name: tags['display-name'], message, id:tags['custom-reward-id'],type: point })
   })
 }
 
@@ -32,7 +38,7 @@ setInterval(() => {
   document.getElementById("cracker").play()
   if (list[0].message) {
     document.getElementById("text").innerText = list[0].message
-    document.getElementById("tts").src = `https://www.google.com/speech-api/v1/synthesize?text=${msg}&lang=ko-kr&speed=0.4`
+    document.getElementById("tts").src = `https://www.google.com/speech-api/v1/synthesize?text=${list[0].message}&lang=ko-kr&speed=0.4`
   } else {
     document.getElementById("text").innerText = ''
     document.getElementById("tts").src = `https://www.google.com/speech-api/v1/synthesize?text=${list[0].name}님이 ${list[0].type}를 사용했습니다.&lang=ko-kr&speed=0.4`
@@ -48,11 +54,10 @@ setInterval(() => {
 function remove() {
   setTimeout(() => {
     if (!document.getElementById("tts").paused) return remove()
-    $( 'div' ).fadeOut( 500 )
-    already.shift()
-    list.shift()
     setTimeout(() => {
-      play = false
-    }, 100)
+      $( 'div' ).fadeOut( 500 )
+      list.shift()
+      setTimeout(() => play = false, 100)
+    }, 2000)
   }, 10)
 }
