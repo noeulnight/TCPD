@@ -8,6 +8,7 @@
     <link href="/public/css/dashboard.css" rel="stylesheet"/>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.1.0/mdb.min.js"></script>
     <script>let selectid = '' </script>
+    <script src="/public/js/dashboard.js"></script>
   </head>
   <body class="bg-dark"><br>
     <div class="container">
@@ -16,7 +17,8 @@
           <img class="card-img-top" src="holder.js/100px180/" alt="">
           <div class="card-body">
             <h4 class="card-title"><%= user.login %>님의 위젯 세션은</h4>
-            <p class="card-text"><a href="<%= setting.url %><%= user.session %>"><%= setting.url %><%= user.session %></a> 입니다.</p>
+            <p class="card-text"><a href="/widget/<%= user.session %>"><%= setting.url %><%= user.session %></a> 입니다.</p><br/>
+            <p class="card-text">현재 사용 가능한 포인트 도네이션</p>
           </div>
         </div>
       </div>
@@ -26,9 +28,9 @@
             <div class="card-body">
               <img class="card-img-top" style="width: 50px;" src="<%= v.default_image.url_1x ? v.default_image.url_1 : 'https://static-cdn.jtvnw.net/custom-reward-images/default-1.png' %>" alt="">
               <h4 class="card-title itemtitle"><%= v.title %></h4>
-              <p class="card-text itemdesc"><%= v.prompt %><%= v.cost %>포인트로 구매 할수있습니다.</p>
-              <a onclick="selectid = '<%= v.id %>'; document.getElementById('imguploadLabel').innerText = '\'<%= v.title %>\' 리워드를 선택했습니다.'; document.getElementById('imgsave').action = '/upload/img?id=<%= v.id %>'; document.getElementById('nowimg').src = ('/img/=<%= v.id %>').replace('=', '');" data-mdb-toggle="modal" data-mdb-target="#imgupload" class="btn btn-primary" role="button">후
-              <p class="card-text itemdesc">포인트 ID : <%= v.id %></a>
+              <p class="card-text itemdesc"><%= v.prompt %><%= v.cost %>포인트로 구매 할수있습니다.</p> 
+              <!-- <a onclick="selectid = '<%= v.id %>'; document.getElementById('imguploadLabel').innerText = '\'<%= v.title %>\' 리워드를 선택했습니다.'; document.getElementById('imgsave').action = '/upload/img?id=<%= v.id %>'; document.getElementById('nowimg').src = ('/img/=<%= v.id %>').replace('=', '');" data-mdb-toggle="modal" data-mdb-target="#imgupload" class="btn btn-primary" role="button">후-->
+              <!-- <p class="card-text itemdesc">포인트 ID : <%= v.id %></a>-->
             </div>
           </div>
         <% }) %>
@@ -46,12 +48,10 @@
             <h4>현재 등록된 후원 이미지</h4>
             <img id='nowimg' src="" style="height:150px"><hr/>
             <h4>이미지 새로 등록하기</h4>
-            <form action="/stats" id="imgsave" enctype="multipart/form-data" method="post">
-              <div class="form-group">
-                <input type="file" class="form-control-file" name="image">
-                <input type="submit" value="사진 업로드" class="btn btn-default">            
-              </div>
-            </form>
+            <div class="input-group mb-3">
+              <input type="text" class="form-control" placeholder="업로드할 사진의 url" aria-describedby="button-addon2">
+              <button class="btn btn-outline-secondary" type="button" id="button-addon2">업로드</button>
+            </div>
           </div>
         </div>
       </div>

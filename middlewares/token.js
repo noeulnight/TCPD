@@ -1,5 +1,5 @@
 const knex = require('knex')
-const db = knex({ client: 'mysql', connection: { host: 'localhost', user:'tcpd', database: 'tcpd' } })
+const db = knex({ client: 'mysql', connection: { host: 'tcpd.cafe24app.com', user:'soju07', password: 'so^ju!00*1206~', database: 'soju07' } })
 const fetch = require('node-fetch')
 
 const TClientid = 'jqrenqwmu7mrkb5mrtp6ga2d90lzxn'
