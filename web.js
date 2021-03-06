@@ -31,7 +31,7 @@ app.use(express.json())
 app.use(cookieParser())
 app.use(cors())
 
-passport.use(new twitchStrategy({clientID:TClientid, clientSecret: TClientsecret, callbackURL: 'http://localhost:8080/auth/twitch', scope: 'user_read channel:read:redemptions'}, async (accessToken, refreshToken, profile, done) => {
+passport.use(new twitchStrategy({clientID:TClientid, clientSecret: TClientsecret, callbackURL: 'http://twilow.ga/auth/twitch', scope: 'user_read channel:read:redemptions'}, async (accessToken, refreshToken, profile, done) => {
   let user
   const random = crs({length: 10, type: 'alphanumeric'})
   const [exist] = await db.where({ id: profile.id }).from('users').select('*')
